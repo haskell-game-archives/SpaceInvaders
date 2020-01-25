@@ -52,7 +52,6 @@ module PhysicalDimensions (
 ) where
 
 import FRP.Yampa (Time, DTime)
-import FRP.Yampa.Miscellany (fMod)
 import FRP.Yampa.Geometry (Vector2, Vector3, Point2, Point3)
 
 
@@ -131,3 +130,13 @@ bearingToHeading b = (fMod (270 - b) 360 - 180) * pi / 180
 -- The resulting bearing is in the interval [0, 360).
 headingToBearing :: Heading -> Bearing
 headingToBearing d = fMod (90 - d * 180 / pi) 360
+
+-- port Yampa-0.10.0
+fMod :: (RealFrac a) => a -> a -> a
+fMod x y = snd (fDivMod x y)
+
+fDivMod :: (RealFrac a) => a -> a -> (Integer, a)
+fDivMod x y = (q, r)
+    where
+        q = (floor (x/y))
+        r = x - fromIntegral q * y

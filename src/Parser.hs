@@ -34,12 +34,10 @@ module Parser (
     dragging            -- :: SF GameInput Bool
 ) where
 
-import Data.Maybe (isNothing, isJust)
+import Data.Maybe (isJust)
 import qualified Graphics.HGL as HGL (Event(..))
-import Data.Char (ord, isSpace, isDigit)
 
 import FRP.Yampa
-import FRP.Yampa.Utilities
 import FRP.Yampa.Geometry
 -- import FRP.Yampa.Miscellany (mapFst)
 
@@ -245,48 +243,6 @@ scanSubCmd pfx0 cmds = S (scHlp pfx0 cmds)
                                                     pfx'
 
 
--- Scan fixed-length integer argument.
--- pfx0 ....... Initial prefix (command scanned thus far).
--- n0 ......... Maximal number of digits.
--- cont ....... Continuation: will be passed the new prefix and the
---              integer value of the scanned argument.
-
-scanIntegerArg :: String -> Int -> Cont (String,Integer) -> Scanner
-scanIntegerArg pfx0 n0 cont | n0 > 0 = S (siaHlp (pfx0 ++ " ") n0 0)
-    where
-        siaHlp pfx n a c =
-            if c == '\r' then
-                cont (pfx, a)
-            else if isDigit c then
-                let a'   = a * 10 + fromIntegral (ord c - ord '0')
-                    pfx' = pfx ++ [c]
-                in
-                    if n > 1 then
-                        emitPfx (S (siaHlp pfx' (n - 1) a')) pfx'
-                    else
-                        cont (pfx', a')
-            else
-                emitPfx (S (siaHlp (pfx0 ++ " ") n0 0)) pfx0
-
-
--- Scan variable-length string argument.
--- pfx0 ....... Initial prefix (command scanned thus far).
--- cont ....... Continuation: will be passed the new prefix and the
---              string value of the scanned argument.
-
-scanStringArg :: String -> Cont (String,String) -> Scanner
-scanStringArg pfx0 cont = S (ssaHlp (pfx0 ++ " ") "")
-    where
-        ssaHlp pfx a c =
-            if c == '\r' then
-                cont (pfx, a)
-            else
-                let a'   = dropWhile isSpace $ a ++ [c]
-                    pfx' = pfx ++ [c]
-                in
-                    emitPfx (S (ssaHlp pfx' a')) pfx'
-
-
 -- Emit command (and command string), then continue scanning.
 emitCmd :: Scanner -> Command -> String -> Kont
 emitCmd scanner cmd cmdStr = ((cmdStr, Just cmd), scanner)
@@ -317,6 +273,7 @@ data PDState = PDState {
 
 
 -- Initial state.
+initPDS :: PDState
 initPDS = PDState {
               pdsPos          = origin,
               pdsDragStartPos = origin,

@@ -45,7 +45,6 @@ import FRP.Yampa.Forceable
 
 import Parser (GameInput)
 import PhysicalDimensions
-import WorldGeometry
 
 
 ------------------------------------------------------------------------------

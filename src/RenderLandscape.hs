@@ -18,8 +18,6 @@ module RenderLandscape (
 import Data.Array
 import qualified Graphics.HGL as HGL
 
-import FRP.Yampa.Point2 (Point2(..))
-
 import WorldGeometry
 import Colors
 import ColorBindings

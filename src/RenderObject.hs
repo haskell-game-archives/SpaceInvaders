@@ -78,18 +78,6 @@ triangle c p1 p2 p3 =
         gp3 = position2ToGPoint p3
 
 
-rectangle :: Color -> Position2 -> Position2 -> HGL.Graphic
-rectangle c p1 p2 =
-    HGL.mkBrush (colorTable ! c) $ \brush ->
-    HGL.withBrush brush       $
-    HGL.polygon [gp11, gp12, gp22, gp21]
-    where
-        gp11@(x1,y1) = position2ToGPoint p1
-        gp12         = (x1, y2)
-        gp22@(x2,y2) = position2ToGPoint p2
-        gp21         = (x2, y1)
-
-
 circle :: Color -> Position2 -> Length -> HGL.Graphic
 circle c p r = 
     HGL.mkBrush (colorTable ! c) $ \brush ->

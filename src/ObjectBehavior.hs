@@ -17,11 +17,7 @@ module ObjectBehavior (
     alien       -- :: RandomGen g => g -> Position2 -> Object
 ) where
 
-import qualified System.Random as Random
-
 import FRP.Yampa
-import FRP.Yampa.Integration
-import FRP.Yampa.Utilities
 import FRP.Yampa.Geometry
 
 import PhysicalDimensions
@@ -37,7 +33,8 @@ import Object
 gun :: Position2 -> Object
 gun (Point2 x0 y0) = proc (ObjInput {oiGameInput = gi}) -> do
     -- Position.
-    (Point2 xd _) <- ptrPos -< gi               -- Desired position
+    x1 <- ptrPos -< gi               -- Desired position
+    let (Point2 xd _) = x1
     rec
         -- Controller.
         let ad = 10 * (xd - x) - 5 * v          -- Desired acceleration
@@ -253,13 +250,15 @@ forceField = proc (p, v) -> do
     returnA -< (mergeBy (^+^) (lfi `tag` (vector2 (-2 * vector2X v) 0))
                               (rfi `tag` (vector2 (-2 * vector2X v) 0)))
 
+gravity :: Vector2 Velocity
 gravity = vector2 0 (-20)
 
 
 ------------------------------------------------------------------------------
 -- Support
 ------------------------------------------------------------------------------
-
+limit :: Ord a => a -> a -> a -> a
 limit ll ul x = if x < ll then ll else if x > ul then ul else x
 
+symLimit :: (Ord a, Num a) => a -> a -> a
 symLimit l = let absl = abs l in limit (-absl) absl
